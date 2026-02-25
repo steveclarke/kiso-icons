@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require_relative "../config/application"
+require "kiso/icons/commands"
+
+Kiso::Icons::Commands.start(ARGV)
