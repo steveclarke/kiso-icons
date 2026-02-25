@@ -3,6 +3,10 @@
 /tmp/
 Gemfile.lock
 *.gem
+.DS_Store
+*.swp
+*~
+.ruby-lsp/
 test/dummy/log/
 test/dummy/tmp/
 test/dummy/vendor/icons/
