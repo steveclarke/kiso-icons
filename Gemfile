@@ -12,3 +12,4 @@ gem "standard"
 # Integration test dummy app
 gem "rails", ">= 8.0"
 gem "propshaft"
+gem "puma"

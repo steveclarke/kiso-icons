@@ -1,0 +1,12 @@
+<h1>kiso-icons Demo</h1>
+<p class="subtitle">10 "home" icons from different Iconify sets, rendered as inline SVG</p>
+
+<div class="grid">
+  <% @icons.each do |icon| %>
+    <div class="card">
+      <%= kiso_icon_tag("#{icon[:set]}:#{icon[:name]}") %>
+      <div class="label"><%= icon[:label] %></div>
+      <div class="name"><%= "#{icon[:set]}:#{icon[:name]}" %></div>
+    </div>
+  <% end %>
+</div>

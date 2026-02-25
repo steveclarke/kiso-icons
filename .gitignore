@@ -5,3 +5,4 @@ Gemfile.lock
 *.gem
 test/dummy/log/
 test/dummy/tmp/
+test/dummy/vendor/icons/

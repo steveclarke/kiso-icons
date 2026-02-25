@@ -104,6 +104,8 @@ class Kiso::Icons::Commands < Thor
       return
     end
 
+    body = body.force_encoding("UTF-8")
+
     data = JSON.parse(body)
     unless data["icons"]
       say "  error   #{set_name}.json has no 'icons' key -- invalid Iconify format", :red
