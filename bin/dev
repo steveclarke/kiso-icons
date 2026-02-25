@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PORT="${1:-3100}"
+
+if [ ! -d "test/dummy/vendor/icons" ] || [ -z "$(ls test/dummy/vendor/icons/*.json 2>/dev/null)" ]; then
+  echo "No icon sets pinned. Running bin/setup first..."
+  echo ""
+  bin/setup
+  echo ""
+fi
+
+echo "Starting dummy app on http://localhost:${PORT}"
+cd test/dummy
+exec bundle exec rails server -p "$PORT"

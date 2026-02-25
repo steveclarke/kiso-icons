@@ -64,6 +64,25 @@ The rendered SVG uses `width="1em" height="1em"` and `currentColor` — it inher
 
 Lucide ships with the gem (81KB gzipped) for zero-config usage. No need to pin it unless you want to update to a newer version.
 
+## Development
+
+```bash
+git clone https://github.com/steveclarke/kiso-icons.git
+cd kiso-icons
+bin/setup    # install deps + pin demo icon sets
+bin/dev      # start demo app on http://localhost:3100
+```
+
+`bin/dev` starts a dummy Rails app that renders home icons from 10 different icon sets. Pass a port number to change the default: `bin/dev 4200`.
+
+Run tests:
+
+```bash
+bundle exec rake test            # unit tests (no Rails)
+bundle exec rake test_integration # integration tests (boots Rails)
+bundle exec rake                  # both
+```
+
 ## License
 
 MIT License. See [MIT-LICENSE](MIT-LICENSE).

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "== Installing dependencies =="
+bundle install
+
+echo ""
+echo "== Pinning demo icon sets =="
+cd test/dummy
+bundle exec ruby -e '
+require_relative "config/environment"
+require "kiso/icons/commands"
+sets = %w[heroicons mdi tabler ph ri bi carbon ion octicon]
+Kiso::Icons::Commands.start(["pin"] + sets)
+'
+
+echo ""
+echo "== Done! Run bin/dev to start the demo app =="
