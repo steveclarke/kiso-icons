@@ -11,14 +11,34 @@ Part of the [Kiso 基礎](https://github.com/steveclarke/kiso) UI component fami
 ```bash
 ./bin/bundle add kiso-icons
 ./bin/rails kiso_icons:install
-./bin/kiso-icons pin lucide
 ```
 
-The installer creates `vendor/icons/` and a `bin/kiso-icons` binstub. The `pin` command downloads [Lucide](https://lucide.dev) (or any [Iconify set](https://icon-sets.iconify.design/)) to `vendor/icons/` — commit it to git just like vendored JavaScript.
+This creates `vendor/icons/` and a `bin/kiso-icons` binstub.
+
+## Quick start
+
+[Lucide](https://lucide.dev) ships with the gem — no pinning needed. Start using icons immediately:
+
+```erb
+<%= kiso_icon_tag("check") %>
+<%= kiso_icon_tag("arrow-right") %>
+```
+
+Want a different icon set? Pin it:
+
+```bash
+./bin/kiso-icons pin heroicons
+```
+
+Then use it with the set prefix:
+
+```erb
+<%= kiso_icon_tag("heroicons:home") %>
+```
+
+Browse all available sets at [icon-sets.iconify.design](https://icon-sets.iconify.design/).
 
 ## Usage
-
-### Render icons in views
 
 ```erb
 <%= kiso_icon_tag("lucide:check") %>
@@ -27,30 +47,27 @@ The installer creates `vendor/icons/` and a `bin/kiso-icons` binstub. The `pin` 
 <%= kiso_icon_tag("check", aria: { label: "Done" }) %> <%# accessible icon %>
 ```
 
-### CLI commands
+### Pin icon sets
+
+Pin downloads an Iconify JSON file to `vendor/icons/`. Commit it to git, just like vendored JavaScript with importmap-rails.
 
 ```bash
-bin/kiso-icons pin SETS...   # Download icon sets to vendor/icons/
-bin/kiso-icons unpin SET     # Remove a vendored icon set
-bin/kiso-icons pristine      # Re-download all pinned icon sets
-bin/kiso-icons list          # Show pinned icon sets
+./bin/kiso-icons pin lucide             # vendor Lucide (overrides the bundled copy)
+./bin/kiso-icons pin heroicons mdi      # pin multiple sets at once
+./bin/kiso-icons unpin heroicons        # remove a vendored set
+./bin/kiso-icons pristine               # re-download all pinned sets
+./bin/kiso-icons list                   # show what's pinned
 ```
 
 ## How it works
 
-Kiso Icons follows the same vendor pattern as importmap-rails:
+Icons are resolved through a cascade:
 
-1. **Pin** icon sets from Iconify's repository to `vendor/icons/`
-2. **Commit** the JSON files to git (just like vendored JavaScript)
-3. **Render** icons as inline SVG with `kiso_icon_tag()`
-
-Icons are resolved through a cascade: vendored JSON → bundled Lucide (ships with the gem) → Iconify API fallback (development only).
+1. **Vendored JSON** — pinned sets in `vendor/icons/`
+2. **Bundled Lucide** — ships with the gem (81KB gzipped), zero-config default
+3. **Iconify API** — fallback in development only, with a prompt to pin
 
 The rendered SVG uses `width="1em" height="1em"` and `currentColor` — it inherits size from font-size and color from the parent element. No CSS framework dependency.
-
-## Bundled icons
-
-Lucide ships with the gem (81KB gzipped) for zero-config usage. No need to pin it unless you want to update to a newer version.
 
 ## Development
 

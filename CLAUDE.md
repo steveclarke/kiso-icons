@@ -2,64 +2,32 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
-
-Kiso Icons is a Rails gem that brings Iconify's 224 icon sets (299k+ icons) to Rails applications as inline SVGs with zero JavaScript. Icons are "pinned" (vendored as JSON) and committed to version control, similar to how importmap-rails works.
-
 ## Commands
 
 ```bash
-# Setup
 bin/setup                          # Install deps + pin demo icon sets
-
-# Tests
 bundle exec rake                   # All tests (unit + integration)
-bundle exec rake test              # Unit tests only (no Rails boot)
-bundle exec rake test_integration  # Integration tests (boots dummy Rails app)
-
-# Run a single test file
-bundle exec ruby -Itest test/resolver_test.rb
-
-# Run a single test by name
-bundle exec ruby -Itest test/resolver_test.rb -n test_resolves_icon_with_set_prefix
-
-# Lint
-bundle exec standardrb             # Check
-bundle exec standardrb --fix       # Auto-fix
-
-# Demo app
-bin/dev [PORT]                     # Starts dummy Rails app (default: port 3100)
+bundle exec rake test              # Unit tests only
+bundle exec rake test_integration  # Integration tests only
+bundle exec ruby -Itest test/resolver_test.rb                              # Single file
+bundle exec ruby -Itest test/resolver_test.rb -n test_resolves_with_prefix # Single test
+bundle exec standardrb             # Lint (StandardRB)
+bundle exec standardrb --fix       # Auto-fix lint
 ```
 
-## Architecture
+## Test Setup
 
-### Icon Resolution Cascade (Resolver)
+Two separate test suites with different boot paths:
 
-When `kiso_icon_tag("lucide:check")` is called, the Resolver finds icons through a priority cascade:
+- **Unit tests** (`test/*_test.rb`) require `test_helper.rb` — loads the gem directly, no Rails. Use `TestFixtures` module for sample icon set data and `TestFixtures.write_vendor_set`/`write_bundled_set` helpers to set up temp directories.
+- **Integration tests** (`test/integration/*_test.rb`) require `test/integration_test_helper.rb` — boots the dummy Rails app in `test/dummy/`. These can use `ActionDispatch::IntegrationTest` and hit routes defined in `test/dummy/config/routes.rb`.
 
-1. **In-memory cache** — thread-safe Cache with Mutex
-2. **Already-loaded sets** — Resolver's `@loaded_sets` hash
-3. **Vendored JSON** — `vendor/icons/*.json` committed to the app's repo
-4. **Bundled Lucide** — `data/lucide.json.gz` shipped with the gem
-5. **Iconify API fallback** — dev/test only, disabled in production
+Unit tests mock all HTTP with WebMock (included via `webmock/minitest`). Icon set file I/O in unit tests should use `Dir.mktmpdir` for isolation.
 
-### Key Classes
+## Architecture Notes
 
-- **Resolver** (`lib/kiso/icons/resolver.rb`) — orchestrates icon lookup through the cascade, parses `"set:icon"` notation, falls back to `default_set` for bare names
-- **Set** (`lib/kiso/icons/set.rb`) — loads/parses Iconify JSON, resolves aliases with transforms (rotate, hFlip, vFlip), max alias depth of 5
-- **Renderer** (`lib/kiso/icons/renderer.rb`) — builds inline SVG strings with `width="1em"`, `currentColor`, viewBox, aria-hidden; supports `class:`, `data:`, `aria:` attributes; HTML-escapes to prevent XSS
-- **Helper** (`lib/kiso/icons/helper.rb`) — provides `kiso_icon_tag()` view helper, included into ActionView via Railtie
-- **Commands** (`lib/kiso/icons/commands.rb`) — Thor CLI (`bin/kiso-icons pin|unpin|pristine|list`), downloads icon sets from GitHub
-- **ApiClient** (`lib/kiso/icons/api_client.rb`) — Iconify API client for dev-only fallback
-- **Railtie** (`lib/kiso/icons/railtie.rb`) — Rails integration: sets `fallback_to_api` per environment, includes helper, loads rake tasks
+All classes live under `Kiso::Icons` in `lib/kiso/icons/`. The Resolver is the central orchestrator — it owns the resolution cascade (cache → loaded sets → vendor JSON → bundled gzip → API). The Set class handles Iconify JSON parsing including alias resolution with transforms (rotate/flip) up to 5 levels deep. The Renderer produces the final SVG string with HTML-escaped attributes.
 
-### Test Structure
+The Railtie auto-configures `fallback_to_api` based on Rails environment (true in dev/test, false in production) and injects the `kiso_icon_tag` helper into ActionView.
 
-- **Unit tests** (`test/*_test.rb`) — no Rails dependency, use temp dirs for file I/O, mock HTTP with WebMock
-- **Integration tests** (`test/integration/*_test.rb`) — boot the dummy Rails app in `test/dummy/`
-- **Test fixtures** (`test/fixtures/`) — sample icon set JSON data
-- **TestFixtures module** (`test/test_helper.rb`) — shared fixture helpers used across tests
-
-### Runtime Dependencies
-
-Rails 8.0+ (railties, activesupport, actionpack). Linting uses StandardRB.
+The CLI (`lib/kiso/icons/commands.rb`) uses Thor and downloads icon set JSON from GitHub's raw content URL for the iconify/icon-sets repo.
