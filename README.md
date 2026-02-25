@@ -8,17 +8,9 @@ Part of the [Kiso 基礎](https://github.com/steveclarke/kiso) UI component fami
 
 ## Installation
 
-Add to your Gemfile:
-
-```ruby
-gem "kiso-icons"
-```
-
-Then run the installer:
-
 ```bash
-bundle install
-bin/rails kiso_icons:install
+./bin/bundle add kiso-icons
+./bin/rails kiso_icons:install
 ```
 
 This creates `vendor/icons/` and a `bin/kiso-icons` binstub.
