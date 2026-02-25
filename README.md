@@ -11,18 +11,12 @@ Part of the [Kiso 基礎](https://github.com/steveclarke/kiso) UI component fami
 ```bash
 ./bin/bundle add kiso-icons
 ./bin/rails kiso_icons:install
+./bin/kiso-icons pin lucide
 ```
 
-This creates `vendor/icons/` and a `bin/kiso-icons` binstub.
+The installer creates `vendor/icons/` and a `bin/kiso-icons` binstub. The `pin` command downloads [Lucide](https://lucide.dev) (or any [Iconify set](https://icon-sets.iconify.design/)) to `vendor/icons/` — commit it to git just like vendored JavaScript.
 
 ## Usage
-
-### Pin icon sets
-
-```bash
-bin/kiso-icons pin lucide
-bin/kiso-icons pin heroicons mdi tabler
-```
 
 ### Render icons in views
 
