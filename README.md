@@ -1,8 +1,10 @@
-# Kiso Icons
+# Kiso Icons 基礎
 
 Iconify icons for Rails — vendor pattern like importmap-rails.
 
 Pin any of [Iconify's 224 icon sets](https://icon-sets.iconify.design/) (299k+ icons) to `vendor/icons/`. Inline SVG rendering, zero JavaScript, vendored for production.
+
+Part of the [Kiso 基礎](https://github.com/steveclarke/kiso) UI component family. Works standalone in any Rails 8+ app — no other Kiso gems required.
 
 ## Installation
 
