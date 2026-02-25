@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["Steve Clarke"]
   spec.email = ["steve@sevenview.ca"]
   spec.homepage = "https://github.com/steveclarke/kiso-icons"
-  spec.summary = "Iconify icons for Rails -- vendor pattern like importmap-rails"
+  spec.summary = "Iconify icons for Rails"
   spec.description = "Pin any of Iconify's 224 icon sets (299k icons) to vendor/icons/. " \
                      "Inline SVG rendering, zero JavaScript, vendored for production."
   spec.license = "MIT"

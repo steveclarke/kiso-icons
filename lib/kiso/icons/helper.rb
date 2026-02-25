@@ -17,12 +17,22 @@ module Kiso
 
         unless icon_data
           if defined?(Rails) && Rails.env.development?
-            return "<!-- kiso-icons: '#{ERB::Util.html_escape(name)}' not found -->".html_safe
+            return safe_string("<!-- kiso-icons: '#{ERB::Util.html_escape(name)}' not found -->")
           end
-          return "".html_safe
+          return safe_string("")
         end
 
         Kiso::Icons::Renderer.render(icon_data, css_class: options.delete(:class), **options)
+      end
+
+      private
+
+      def safe_string(str)
+        if defined?(ActiveSupport::SafeBuffer)
+          ActiveSupport::SafeBuffer.new(str)
+        else
+          str
+        end
       end
     end
   end

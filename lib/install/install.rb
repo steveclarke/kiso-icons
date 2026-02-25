@@ -4,4 +4,4 @@ keep_file "vendor/icons"
 
 say "Copying binstub"
 copy_file "#{__dir__}/bin/kiso-icons", "bin/kiso-icons"
-chmod "bin", 0755 & ~File.umask, verbose: false
+chmod "bin", 0o755 & ~File.umask, verbose: false
