@@ -8,3 +8,7 @@ gem "rake"
 gem "minitest"
 gem "webmock"
 gem "standard"
+
+# Integration test dummy app
+gem "rails", ">= 8.0"
+gem "propshaft"
