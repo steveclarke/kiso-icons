@@ -24,9 +24,6 @@ module Kiso
         # 4. Bundled (lucide ships in gem)
         icon_data ||= resolve_from_bundled(set_prefix, icon_name)
 
-        # 5. API fallback (dev only)
-        icon_data ||= resolve_from_api(set_prefix, icon_name)
-
         Kiso::Icons.cache.set(set_prefix, icon_name, icon_data) if icon_data
 
         icon_data
@@ -68,11 +65,6 @@ module Kiso
         set.icon(icon_name)
       end
 
-      def resolve_from_api(set_prefix, icon_name)
-        return nil unless Kiso::Icons.configuration.fallback_to_api
-
-        ApiClient.fetch_icon(set_prefix, icon_name)
-      end
     end
   end
 end

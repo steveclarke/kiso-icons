@@ -45,7 +45,6 @@ class HelperTest < Minitest::Test
   end
 
   def test_returns_empty_string_for_missing_icon
-    Kiso::Icons.configure { |c| c.fallback_to_api = false }
     result = kiso_icon_tag("nonexistent:missing")
     assert_equal "", result
   end

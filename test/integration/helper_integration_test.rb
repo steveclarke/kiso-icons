@@ -41,18 +41,11 @@ class HelperIntegrationTest < ActionDispatch::IntegrationTest
     refute_includes svg, "aria-hidden"
   end
 
-  def test_missing_icon_returns_comment_in_development
+  def test_missing_icon_returns_empty_string
     view = ActionView::Base.new(ActionView::LookupContext.new([]), {}, nil)
-
-    # Disable API fallback to test the missing icon path
-    original = Kiso::Icons.configuration.fallback_to_api
-    Kiso::Icons.configuration.fallback_to_api = false
 
     result = view.kiso_icon_tag("nonexistent:missing")
 
-    # In test env (not development), missing icons return empty string
     assert_equal "", result
-  ensure
-    Kiso::Icons.configuration.fallback_to_api = original
   end
 end

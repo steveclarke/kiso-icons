@@ -7,8 +7,4 @@ class RailtieTest < Minitest::Test
     assert_includes ActionView::Base.instance_methods, :kiso_icon_tag
   end
 
-  def test_configures_fallback_to_api_in_test
-    assert Kiso::Icons.configuration.fallback_to_api,
-      "Expected fallback_to_api to be true in test environment"
-  end
 end

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- API fallback (`fallback_to_api` config option and `ApiClient` class). Icons must now be pinned explicitly with `bin/kiso-icons pin <set>`. The bundled Lucide set still works with no setup.
+
 ## [0.2.0.pre] - 2026-02-25
 
 ### Fixed

@@ -51,7 +51,7 @@ You can pass any HTML attribute. If you add `aria: { label: "..." }`, screen rea
 
 ### Pin icon sets
 
-The `pin` command downloads an Iconify JSON file to `vendor/icons/`. Commit it to git. In production, icons load from these files with no API calls.
+The `pin` command downloads an Iconify JSON file to `vendor/icons/`. Commit it to git.
 
 ```bash
 ./bin/kiso-icons pin lucide             # pin Lucide (replaces the bundled copy)
@@ -70,7 +70,6 @@ Add an initializer to change the defaults:
 Kiso::Icons.configure do |config|
   config.default_set = "lucide"        # icon set used when no prefix is given
   config.vendor_path = "vendor/icons"  # where pinned JSON files are stored
-  config.fallback_to_api = false       # fetch missing icons from the Iconify API
 end
 ```
 
@@ -78,10 +77,6 @@ end
 |--------|---------|-------------|
 | `default_set` | `"lucide"` | Icon set used when you write `kiso_icon_tag("check")` with no prefix. |
 | `vendor_path` | `"vendor/icons"` | Where pinned JSON files are stored. |
-| `fallback_to_api` | `true` in dev, `false` in prod | If `true`, missing icons are fetched from the Iconify API. A log message tells you to pin the set. |
-
-> [!TIP]
-> In production, `fallback_to_api` is off. Pin all the sets you need so icons load from local files.
 
 ## How it works
 
@@ -89,7 +84,6 @@ Icons are found in this order:
 
 1. **Pinned JSON** — your sets in `vendor/icons/`
 2. **Bundled Lucide** — ships with the gem (81 KB gzipped), works with no setup
-3. **Iconify API** — only in dev mode, with a prompt to pin
 
 Each SVG uses `width="1em"`, `height="1em"`, and `currentColor`. It inherits its size from `font-size` and its color from the parent element. No CSS framework needed.
 
