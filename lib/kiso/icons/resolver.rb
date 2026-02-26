@@ -64,7 +64,6 @@ module Kiso
         @mutex.synchronize { @loaded_sets[set_prefix] = set }
         set.icon(icon_name)
       end
-
     end
   end
 end
