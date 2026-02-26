@@ -118,12 +118,14 @@ class Kiso::Icons::Commands < Thor
     say "  pin     vendor/icons/#{set_name}.json (#{icon_count} icons, #{size_kb} KB)", :green
   end
 
-  def download(url)
+  def download(url, redirect_limit = 5)
+    raise "Too many redirects" if redirect_limit == 0
+
     uri = URI(url)
     response = Net::HTTP.get_response(uri)
     case response
     when Net::HTTPSuccess then response.body
-    when Net::HTTPRedirection then download(response["location"])
+    when Net::HTTPRedirection then download(response["location"], redirect_limit - 1)
     end
   rescue SocketError, Net::OpenTimeout, Net::ReadTimeout, Errno::ECONNREFUSED => e
     say "  error   Network error: #{e.message}", :red
