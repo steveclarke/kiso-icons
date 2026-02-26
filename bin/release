@@ -26,10 +26,12 @@ Options:
 Steps performed:
   1. Preflight checks (clean tree, on master, synced with origin)
   2. Run full test suite and linter
-  3. Bump version in lib/kiso/icons/version.rb
-  4. Verify gem builds
-  5. Commit version bump and create annotated tag
-  6. Print the git push command to trigger the release workflow
+  3. Check CHANGELOG.md has unreleased entries
+  4. Bump version in lib/kiso/icons/version.rb
+  5. Update CHANGELOG.md (move Unreleased → version heading)
+  6. Verify gem builds
+  7. Commit version bump and create annotated tag
+  8. Push to origin and create GitHub Release
 
 Examples:
   bin/release 0.1.0       # release version 0.1.0
@@ -71,6 +73,7 @@ if [ -z "$NEW_VERSION" ]; then
 fi
 
 TAG="v${NEW_VERSION}"
+TODAY=$(date +%Y-%m-%d)
 
 step "Preflight checks"
 
@@ -102,6 +105,19 @@ if git rev-parse "$TAG" >/dev/null 2>&1; then
 fi
 ok "Tag ${TAG} is available"
 
+# gh CLI available?
+if ! command -v gh &>/dev/null; then
+  die "gh CLI not found. Install it: https://cli.github.com"
+fi
+ok "gh CLI available"
+
+# CHANGELOG.md has unreleased entries?
+UNRELEASED_CONTENT=$(sed -n '/^## \[Unreleased\]/,/^## \[/{/^## \[/!p;}' CHANGELOG.md | sed '/^$/d')
+if [ -z "$UNRELEASED_CONTENT" ]; then
+  die "CHANGELOG.md has no entries under [Unreleased]. Add changes before releasing."
+fi
+ok "CHANGELOG.md has unreleased entries"
+
 step "Running tests"
 bundle exec rake
 ok "All tests pass"
@@ -117,6 +133,9 @@ if [ "$DRY_RUN" = true ]; then
   echo "  New version:     ${NEW_VERSION}"
   echo "  Tag:             ${TAG}"
   echo ""
+  echo "  Unreleased changelog entries:"
+  echo "$UNRELEASED_CONTENT" | sed 's/^/    /'
+  echo ""
   echo "  All checks passed. Run without --dry-run to commit and tag."
   exit 0
 fi
@@ -125,26 +144,56 @@ step "Bumping version to ${NEW_VERSION}"
 sed -i '' "s/VERSION = \".*\"/VERSION = \"${NEW_VERSION}\"/" lib/kiso/icons/version.rb
 ok "Updated lib/kiso/icons/version.rb"
 
+step "Updating CHANGELOG.md"
+
+# Replace [Unreleased] section with new version heading, add fresh [Unreleased]
+REPO_URL="https://github.com/steveclarke/kiso-icons"
+
+# Build the new compare/release links
+NEW_LINKS="[Unreleased]: ${REPO_URL}/compare/${TAG}...HEAD"
+VERSION_LINK="[${NEW_VERSION}]: ${REPO_URL}/releases/tag/${TAG}"
+
+# Insert new version heading after [Unreleased], keep [Unreleased] empty
+sed -i '' "s/^## \[Unreleased\]$/## [Unreleased]\n\n## [${NEW_VERSION}] - ${TODAY}/" CHANGELOG.md
+
+# Replace the link reference lines at the bottom
+sed -i '' "s|^\[Unreleased\]:.*|${NEW_LINKS}\n${VERSION_LINK}|" CHANGELOG.md
+
+ok "Updated CHANGELOG.md"
+
 step "Verifying gem builds"
 gem build kiso-icons.gemspec --silent
 rm -f kiso-icons-*.gem
 ok "Gem builds successfully"
 
-step "Committing version bump"
-git add lib/kiso/icons/version.rb
+step "Committing release"
+git add lib/kiso/icons/version.rb CHANGELOG.md
 git commit -m "Release v${NEW_VERSION}"
 
 step "Tagging ${TAG}"
 git tag -a "$TAG" -m "Release ${NEW_VERSION}"
 
-step "Ready to publish"
+step "Pushing to origin"
+git push origin master "$TAG"
+ok "Pushed commit and tag"
+
+step "Creating GitHub Release"
+
+# Extract this version's changelog entries for the release body
+RELEASE_NOTES=$(sed -n "/^## \[${NEW_VERSION}\]/,/^## \[/{/^## \[/!p;}" CHANGELOG.md | sed -e '/^$/d' -e '1{/^$/d;}' -e '${/^$/d;}')
+
+if [[ "$NEW_VERSION" == *pre* || "$NEW_VERSION" == *alpha* || "$NEW_VERSION" == *beta* || "$NEW_VERSION" == *rc* ]]; then
+  gh release create "$TAG" --title "$TAG" --notes "$RELEASE_NOTES" --prerelease
+else
+  gh release create "$TAG" --title "$TAG" --notes "$RELEASE_NOTES"
+fi
+ok "GitHub Release created"
+
+step "Release complete"
 echo ""
 echo "  Version: ${NEW_VERSION}"
 echo "  Tag:     ${TAG}"
 echo "  Commit:  $(git rev-parse --short HEAD)"
 echo ""
-echo -e "${YELLOW}Push to origin to trigger the release workflow:${RESET}"
-echo ""
-echo "  git push origin master ${TAG}"
-echo ""
-echo "This will push the gem to RubyGems via GitHub Actions."
+echo "  GitHub Actions will push the gem to RubyGems."
+echo "  Release: ${REPO_URL}/releases/tag/${TAG}"

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0.pre] - 2026-02-25
+
+### Fixed
+
+- Sanitize SVG body content to prevent XSS via malicious icon data
+
 ## [0.1.0.pre] - 2026-02-25
 
 ### Added
@@ -22,5 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rails generator (`kiso_icons:install`) for project setup
 - `pristine` command to re-download all pinned sets
 
-[Unreleased]: https://github.com/steveclarke/kiso-icons/compare/v0.1.0.pre...HEAD
+[Unreleased]: https://github.com/steveclarke/kiso-icons/compare/v0.2.0.pre...HEAD
+[0.2.0.pre]: https://github.com/steveclarke/kiso-icons/releases/tag/v0.2.0.pre
 [0.1.0.pre]: https://github.com/steveclarke/kiso-icons/releases/tag/v0.1.0.pre
