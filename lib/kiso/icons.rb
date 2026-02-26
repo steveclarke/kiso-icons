@@ -46,5 +46,4 @@ require "kiso/icons/cache"
 require "kiso/icons/set"
 require "kiso/icons/resolver"
 require "kiso/icons/renderer"
-require "kiso/icons/api_client"
 require "kiso/icons/railtie" if defined?(Rails::Railtie)

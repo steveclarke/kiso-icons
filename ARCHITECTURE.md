@@ -18,7 +18,6 @@ Resolution cascade (first match wins):
   2. Already-loaded Set     ← set was parsed on a previous request
   3. Vendor JSON            ← vendor/icons/lucide.json (committed to git)
   4. Bundled gzip           ← data/lucide.json.gz (ships with the gem)
-  5. API fallback           ← api.iconify.design (dev/test only)
   │
   ▼
 Set ── find icon ── resolve aliases + apply transforms (rotate, flip)
@@ -67,21 +66,12 @@ Produces the final SVG string. Responsibilities:
 - **Security**: sanitizes the SVG body using Loofah with a custom scrubber that strips `<script>`, `<foreignobject>`, event handlers (`on*`), and `javascript:` URLs
 - Escapes all attribute values (`&`, `"`, `<`, `>`)
 
-### ApiClient (`api_client.rb`)
-
-Network fallback for icons that aren't vendored or bundled. Only active when `fallback_to_api` is true (defaults to dev/test environments).
-
-- **Endpoint**: `https://api.iconify.design/{prefix}.json?icons={name}` — fetches a single icon
-- 5-second timeout, graceful nil on any failure
-- Logs a suggestion to pin the set for offline use
-
 ### Configuration (`configuration.rb`)
 
 | Option | Default | Purpose |
 |--------|---------|---------|
 | `default_set` | `"lucide"` | Set prefix when icon name has no prefix |
 | `vendor_path` | `"vendor/icons"` | Where pinned JSON files live |
-| `fallback_to_api` | env-dependent | Allow API lookups (auto: true in dev/test) |
 | `logger` | stderr | Where warnings and debug info go |
 
 ### Helper (`helper.rb`)
@@ -91,21 +81,19 @@ Provides `kiso_icon_tag(name, **options)` to Rails views. Thin glue between Reso
 ### Railtie (`railtie.rb`)
 
 Auto-configures the gem when loaded in a Rails app:
-- Sets `fallback_to_api` based on `Rails.env`
 - Points logger at `Rails.logger`
 - Injects the Helper into `ActionView::Base`
 
 ## Icon sources
 
-Icons come from three places, each serving a different purpose:
+Icons come from two places:
 
 | Source | What it provides | When it's used |
 |--------|-----------------|----------------|
-| **Vendored** (`vendor/icons/*.json`) | Full icon set JSON files, committed to your app's git repo | Production. Pinned via `bin/kiso-icons pin lucide`. |
-| **Bundled** (`data/lucide.json.gz`) | Lucide set, gzipped, ships inside the gem | Zero-config default so the gem works out of the box. |
-| **API** (`api.iconify.design`) | Single icons fetched on-demand over HTTP | Dev/test fallback for icons you haven't pinned yet. |
+| **Vendored** (`vendor/icons/*.json`) | Full icon set JSON files, committed to your app's git repo | Any environment, when the set has been pinned via `bin/kiso-icons pin <set>`. |
+| **Bundled** (`data/lucide.json.gz`) | Lucide set, gzipped, ships inside the gem | Any environment. Zero-config default so the gem works out of the box. |
 
-The CLI uses a different source for downloading full sets: `https://raw.githubusercontent.com/iconify/icon-sets/master/json/{set}.json` from GitHub. The Iconify API is designed for single-icon lookups, not bulk downloads, so the CLI fetches from the upstream repository directly.
+The CLI downloads full sets from `https://raw.githubusercontent.com/iconify/icon-sets/master/json/{set}.json` on GitHub rather than the Iconify API, which is designed for single-icon lookups rather than bulk downloads.
 
 ## CLI (`commands.rb`)
 
@@ -136,7 +124,6 @@ lib/
   kiso/
     icons.rb                  # Module entry point, singleton accessors, .resolve()
     icons/
-      api_client.rb           # Iconify API fallback
       cache.rb                # In-memory icon cache
       commands.rb             # Thor CLI (pin/unpin/pristine/list)
       configuration.rb        # Config object

@@ -39,7 +39,6 @@ class ResolverTest < Minitest::Test
   def test_returns_nil_for_missing_icon
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
-        Kiso::Icons.configure { |c| c.fallback_to_api = false }
         result = @resolver.resolve("nonexistent:missing")
         assert_nil result
       end
