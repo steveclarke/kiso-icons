@@ -10,3 +10,4 @@ Gemfile.lock
 test/dummy/log/
 test/dummy/tmp/
 test/dummy/vendor/icons/
+.playwright-mcp/
