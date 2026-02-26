@@ -2,7 +2,7 @@
 
 Iconify icons for Rails. Use any of [224 icon sets](https://icon-sets.iconify.design/) (299k+ icons) as inline SVG. No JavaScript needed.
 
-Icons live in `vendor/icons/` as JSON files. Commit them to git, just like vendored JavaScript with importmap-rails.
+Icons live in `vendor/icons/` as JSON files. Commit them to git.
 
 Part of the [Kiso 基礎](https://github.com/steveclarke/kiso) family. Works on its own in any Rails 8+ app.
 
@@ -107,9 +107,11 @@ bin/dev      # start demo app at http://localhost:3100
 Run tests:
 
 ```bash
-bundle exec rake test            # unit tests (no Rails)
-bundle exec rake test_integration # integration tests (boots Rails)
-bundle exec rake                  # both
+bin/rake test              # unit tests (no Rails)
+bin/rake test_integration  # integration tests (boots Rails)
+bin/rake                   # both
+bin/standardrb             # lint (StandardRB)
+bin/standardrb --fix       # auto-fix lint
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to help out.

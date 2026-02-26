@@ -6,13 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 bin/setup                          # Install deps + pin demo icon sets
-bundle exec rake                   # All tests (unit + integration)
-bundle exec rake test              # Unit tests only
-bundle exec rake test_integration  # Integration tests only
+bin/rake                           # All tests (unit + integration)
+bin/rake test                      # Unit tests only
+bin/rake test_integration          # Integration tests only
 bundle exec ruby -Itest test/resolver_test.rb                              # Single file
 bundle exec ruby -Itest test/resolver_test.rb -n test_resolves_with_prefix # Single test
-bundle exec standardrb             # Lint (StandardRB)
-bundle exec standardrb --fix       # Auto-fix lint
+bin/standardrb                     # Lint (StandardRB)
+bin/standardrb --fix               # Auto-fix lint
 ```
 
 ## Test Setup

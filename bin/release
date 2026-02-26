@@ -119,11 +119,11 @@ fi
 ok "CHANGELOG.md has unreleased entries"
 
 step "Running tests"
-bundle exec rake
+bin/rake
 ok "All tests pass"
 
 step "Running linter"
-bundle exec standardrb
+bin/standardrb
 ok "StandardRB clean"
 
 if [ "$DRY_RUN" = true ]; then
