@@ -8,6 +8,7 @@ module Kiso
       initializer "kiso_icons.configure" do |_app|
         Kiso::Icons.configure do |config|
           config.fallback_to_api = Rails.env.development? || Rails.env.test?
+          config.logger = Rails.logger
         end
       end
 

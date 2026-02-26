@@ -19,6 +19,10 @@ module Kiso
         @resolver ||= Resolver.new
       end
 
+      def logger
+        configuration.logger
+      end
+
       def cache
         @cache ||= Cache.new
       end

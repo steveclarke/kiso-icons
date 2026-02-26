@@ -23,7 +23,10 @@ module Kiso
 
           elapsed_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time) * 1000).round
 
-          warn_to_pin(set_prefix, icon_name, elapsed_ms)
+          logger.debug {
+            "Fetched #{set_prefix}:#{icon_name} from Iconify API (#{elapsed_ms}ms).\n" \
+              "  Pin this set for offline use: bin/kiso-icons pin #{set_prefix}"
+          }
 
           {
             body: data["body"],
@@ -31,7 +34,7 @@ module Kiso
             height: data["height"] || 24
           }
         rescue JSON::ParserError => e
-          warn "[Kiso::Icons] Failed to parse API response for #{set_prefix}:#{icon_name}: #{e.message}"
+          logger.warn("Failed to parse API response for #{set_prefix}:#{icon_name}: #{e.message}")
           nil
         end
 
@@ -52,26 +55,19 @@ module Kiso
           when Net::HTTPSuccess then response
           when Net::HTTPNotFound then nil
           else
-            warn "[Kiso::Icons] API returned #{response.code} for #{uri}"
+            logger.warn("API returned #{response.code} for #{uri}")
             nil
           end
         rescue Net::OpenTimeout, Net::ReadTimeout
-          warn "[Kiso::Icons] API timeout for #{uri} (#{TIMEOUT}s)"
+          logger.warn("API timeout for #{uri} (#{TIMEOUT}s)")
           nil
         rescue SocketError, Errno::ECONNREFUSED => e
-          warn "[Kiso::Icons] Network error: #{e.message}"
+          logger.warn("Network error: #{e.message}")
           nil
         end
 
-        def warn_to_pin(set_prefix, icon_name, elapsed_ms)
-          message = "[Kiso::Icons] Fetched #{set_prefix}:#{icon_name} from Iconify API (#{elapsed_ms}ms).\n" \
-            "  Pin this set for offline use: bin/kiso-icons pin #{set_prefix}"
-
-          if defined?(Rails) && defined?(Rails.logger)
-            Rails.logger.debug { message }
-          else
-            warn message
-          end
+        def logger
+          Kiso::Icons.logger
         end
       end
     end

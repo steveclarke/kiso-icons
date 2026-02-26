@@ -8,6 +8,13 @@ require "webmock/minitest"
 require "tmpdir"
 require "fileutils"
 
+# Silence log output during tests — null logger survives reset! calls
+Kiso::Icons::Configuration.prepend(Module.new {
+  def logger
+    @logger ||= Logger.new(File::NULL)
+  end
+})
+
 # Create a small test icon set fixture
 module TestFixtures
   ICON_SET_DATA = {
