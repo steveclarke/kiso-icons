@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0.pre] - 2026-02-26
+
 ### Removed
 
 - API fallback (`fallback_to_api` config option and `ApiClient` class). Icons must now be pinned explicitly with `bin/kiso-icons pin <set>`. The bundled Lucide set still works with no setup.
@@ -32,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rails generator (`kiso_icons:install`) for project setup
 - `pristine` command to re-download all pinned sets
 
-[Unreleased]: https://github.com/steveclarke/kiso-icons/compare/v0.2.0.pre...HEAD
+[Unreleased]: https://github.com/steveclarke/kiso-icons/compare/v0.3.0.pre...HEAD
+[0.3.0.pre]: https://github.com/steveclarke/kiso-icons/releases/tag/v0.3.0.pre
 [0.2.0.pre]: https://github.com/steveclarke/kiso-icons/releases/tag/v0.2.0.pre
 [0.1.0.pre]: https://github.com/steveclarke/kiso-icons/releases/tag/v0.1.0.pre
