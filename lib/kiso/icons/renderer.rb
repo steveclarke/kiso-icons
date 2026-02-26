@@ -1,11 +1,20 @@
 # frozen_string_literal: true
 
+require "loofah"
+
 module Kiso
   module Icons
     class Renderer
+      BLOCKED_SVG_ELEMENTS = %w[
+        script foreignobject iframe object embed
+      ].freeze
+
+      EVENT_HANDLER_RE = /\Aon/i
+      JAVASCRIPT_URI_RE = /\A\s*javascript:/i
+
       class << self
         def render(icon_data, css_class: nil, **options)
-          body = icon_data[:body]
+          body = sanitize_svg_body(icon_data[:body])
           width = icon_data[:width]
           height = icon_data[:height]
 
@@ -47,6 +56,12 @@ module Kiso
 
         private
 
+        def sanitize_svg_body(body)
+          return "" if body.nil? || body.empty?
+
+          Loofah.scrub_fragment(body, SVG_SCRUBBER).to_s
+        end
+
         def escape_attr(value)
           value.to_s
             .gsub("&", "&amp;")
@@ -55,6 +70,35 @@ module Kiso
             .gsub(">", "&gt;")
         end
       end
+
+      # Loofah scrubber that strips dangerous elements and event handlers
+      # from SVG body content while preserving legitimate SVG markup.
+      class SvgScrubber < Loofah::Scrubber
+        def initialize
+          @direction = :top_down
+        end
+
+        def scrub(node)
+          return CONTINUE if node.text? || node.cdata?
+
+          if BLOCKED_SVG_ELEMENTS.include?(node.name.downcase)
+            node.remove
+            return STOP
+          end
+
+          node.attribute_nodes.each do |attr|
+            if attr.name.match?(EVENT_HANDLER_RE)
+              attr.remove
+            elsif attr.name.casecmp("href").zero? || attr.name == "xlink:href"
+              attr.remove if attr.value.match?(JAVASCRIPT_URI_RE)
+            end
+          end
+
+          CONTINUE
+        end
+      end
+
+      SVG_SCRUBBER = SvgScrubber.new.freeze
     end
   end
 end
