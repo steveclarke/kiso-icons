@@ -93,6 +93,8 @@ Icons come from two places:
 | **Vendored** (`vendor/icons/*.json`) | Full icon set JSON files, committed to your app's git repo | Any environment, when the set has been pinned via `bin/kiso-icons pin <set>`. |
 | **Bundled** (`data/lucide.json.gz`) | Lucide set, gzipped, ships inside the gem | Any environment. Zero-config default so the gem works out of the box. |
 
+`Set.from_bundled` decompresses the `.gz` file entirely in memory — no temp files are written to disk. It reads the raw bytes with `File.binread`, wraps them in a `StringIO` so `Zlib::GzipReader` can treat them as a stream, and parses the resulting JSON string directly into the `Set` data structures. After the first load the `Set` object is stored in the Resolver's `@loaded_sets` cache, so decompression only happens once per process.
+
 The CLI downloads full sets from `https://raw.githubusercontent.com/iconify/icon-sets/master/json/{set}.json` on GitHub rather than the Iconify API, which is designed for single-icon lookups rather than bulk downloads.
 
 ## CLI (`commands.rb`)
