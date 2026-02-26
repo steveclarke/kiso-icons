@@ -14,12 +14,13 @@ module Kiso
         def fetch_icon(set_prefix, icon_name)
           start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
-          uri = URI("#{API_BASE}/#{set_prefix}/#{icon_name}.json")
+          uri = URI("#{API_BASE}/#{set_prefix}.json?icons=#{icon_name}")
           response = make_request(uri)
           return nil unless response
 
           data = JSON.parse(response.body)
-          return nil unless data["body"]
+          icon_data = data.dig("icons", icon_name)
+          return nil unless icon_data&.dig("body")
 
           elapsed_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time) * 1000).round
 
@@ -29,9 +30,9 @@ module Kiso
           }
 
           {
-            body: data["body"],
-            width: data["width"] || 24,
-            height: data["height"] || 24
+            body: icon_data["body"],
+            width: icon_data["width"] || data["width"] || 24,
+            height: icon_data["height"] || data["height"] || 24
           }
         rescue JSON::ParserError => e
           logger.warn("Failed to parse API response for #{set_prefix}:#{icon_name}: #{e.message}")
