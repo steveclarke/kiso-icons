@@ -24,7 +24,7 @@ Options:
   -n, --dry-run     Run preflight checks and tests without committing or tagging
 
 Steps performed:
-  1. Preflight checks (clean tree, on main, synced with origin)
+  1. Preflight checks (clean tree, on master, synced with origin)
   2. Run full test suite and linter
   3. Bump version in lib/kiso/icons/version.rb
   4. Verify gem builds
@@ -82,19 +82,19 @@ ok "Working tree clean"
 
 # On main branch?
 BRANCH=$(git branch --show-current)
-if [ "$BRANCH" != "main" ]; then
-  die "Not on main branch (on ${BRANCH}). Switch to main first."
+if [ "$BRANCH" != "master" ]; then
+  die "Not on master branch (on ${BRANCH}). Switch to master first."
 fi
-ok "On main branch"
+ok "On master branch"
 
 # Up to date with remote?
 git fetch origin --quiet
 LOCAL=$(git rev-parse HEAD)
-REMOTE=$(git rev-parse origin/main)
+REMOTE=$(git rev-parse origin/master)
 if [ "$LOCAL" != "$REMOTE" ]; then
-  die "Local main is not up to date with origin. Pull first."
+  die "Local master is not up to date with origin. Pull first."
 fi
-ok "Up to date with origin/main"
+ok "Up to date with origin/master"
 
 # Tag doesn't already exist?
 if git rev-parse "$TAG" >/dev/null 2>&1; then
@@ -145,6 +145,6 @@ echo "  Commit:  $(git rev-parse --short HEAD)"
 echo ""
 echo -e "${YELLOW}Push to origin to trigger the release workflow:${RESET}"
 echo ""
-echo "  git push origin main ${TAG}"
+echo "  git push origin master ${TAG}"
 echo ""
 echo "This will push the gem to RubyGems via GitHub Actions."

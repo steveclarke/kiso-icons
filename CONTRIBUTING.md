@@ -36,7 +36,7 @@ bundle exec standardrb --fix  # auto-fix
 
 ## Submitting Changes
 
-1. Fork the repo and create a branch from `main`
+1. Fork the repo and create a branch from `master`
 2. Add tests for any new functionality
 3. Make sure all tests pass and linting is clean
 4. Write a clear commit message ([Conventional Commits](https://www.conventionalcommits.org/) preferred)
