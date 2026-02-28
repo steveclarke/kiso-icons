@@ -31,4 +31,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "railties", ">= 8.0"
   spec.add_dependency "activesupport", ">= 8.0"
   spec.add_dependency "actionpack", ">= 8.0"
+
+  spec.add_development_dependency "yard"
 end

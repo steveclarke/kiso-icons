@@ -4,6 +4,15 @@ require "kiso/icons/helper"
 
 module Kiso
   module Icons
+    # Rails integration for kiso-icons.
+    #
+    # Automatically loaded when +Rails::Railtie+ is defined.
+    # Registers three initializers:
+    #
+    # - **kiso_icons.configure** — sets the logger to +Rails.logger+
+    # - **kiso_icons.helpers** — includes {Helper} into +ActionView::Base+
+    #   so +kiso_icon_tag+ is available in all views
+    # - **rake_tasks** — loads the kiso-icons rake tasks
     class Railtie < ::Rails::Railtie
       initializer "kiso_icons.configure" do |_app|
         Kiso::Icons.configure do |config|

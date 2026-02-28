@@ -4,14 +4,33 @@ require "erb"
 
 module Kiso
   module Icons
+    # Rails view helper providing the {#kiso_icon_tag} method.
+    #
+    # Included into +ActionView::Base+ automatically by {Railtie}.
     module Helper
-      # Renders an inline SVG icon from Iconify icon sets.
+      # Renders an inline SVG icon from an Iconify icon set.
       #
+      # In development, returns an HTML comment when the icon is not found.
+      # In production, returns an empty string.
+      #
+      # @param name [String] icon name, optionally prefixed with set
+      #   (e.g. +"check"+ or +"lucide:check"+)
+      # @param options [Hash] HTML attributes forwarded to {Renderer.render}.
+      #   Use +:class+ for CSS classes, +:data+ / +:aria+ hashes for
+      #   data-* and aria-* attributes.
+      # @return [ActiveSupport::SafeBuffer, String] the rendered SVG markup
+      #
+      # @example Basic usage
       #   kiso_icon_tag("lucide:check")
-      #   kiso_icon_tag("check")                          # uses default set (lucide)
-      #   kiso_icon_tag("check", class: "w-5 h-5")       # pass any CSS classes
-      #   kiso_icon_tag("check", aria: { label: "Done" }) # accessible icon
       #
+      # @example With default set (lucide)
+      #   kiso_icon_tag("check")
+      #
+      # @example With CSS classes
+      #   kiso_icon_tag("check", class: "w-5 h-5")
+      #
+      # @example Accessible icon with label
+      #   kiso_icon_tag("check", aria: { label: "Done" })
       def kiso_icon_tag(name, **options)
         icon_data = Kiso::Icons.resolve(name.to_s)
 
@@ -27,6 +46,11 @@ module Kiso
 
       private
 
+      # Wraps a string in +ActiveSupport::SafeBuffer+ when available,
+      # otherwise returns the string as-is.
+      #
+      # @param str [String] the string to mark as html_safe
+      # @return [ActiveSupport::SafeBuffer, String]
       def safe_string(str)
         if defined?(ActiveSupport::SafeBuffer)
           ActiveSupport::SafeBuffer.new(str)

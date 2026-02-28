@@ -2,6 +2,7 @@
 
 require "bundler/gem_tasks"
 require "rake/testtask"
+require "yard"
 
 Rake::TestTask.new(:test) do |t|
   t.libs << "test"
@@ -14,6 +15,8 @@ Rake::TestTask.new(:test_integration) do |t|
   t.libs << "lib"
   t.test_files = FileList["test/integration/**/*_test.rb"]
 end
+
+YARD::Rake::YardocTask.new
 
 task test_all: [:test, :test_integration]
 task default: :test_all

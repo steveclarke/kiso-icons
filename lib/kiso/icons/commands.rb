@@ -3,9 +3,20 @@
 require "thor"
 require "kiso/icons"
 
+# Thor CLI for managing vendored Iconify icon sets.
+#
+# Downloads full icon set JSON from GitHub's raw content URL for the
+# iconify/icon-sets repo. Designed for the +bin/kiso-icons+ binstub.
+#
+# @example Pin icon sets
+#   $ bin/kiso-icons pin lucide heroicons
+#
+# @example List pinned sets
+#   $ bin/kiso-icons list
 class Kiso::Icons::Commands < Thor
   include Thor::Actions
 
+  # Base URL for downloading Iconify JSON files from GitHub.
   SETS_URL = "https://raw.githubusercontent.com/iconify/icon-sets/master/json"
 
   def self.exit_on_failure? = false
@@ -19,6 +30,11 @@ class Kiso::Icons::Commands < Thor
       $ bin/kiso-icons pin lucide
       $ bin/kiso-icons pin heroicons mdi tabler
   DESC
+
+  # Downloads one or more icon sets to +vendor/icons/+.
+  #
+  # @param sets [Array<String>] icon set prefixes to download
+  # @return [void]
   def pin(*sets)
     if sets.empty?
       say "Usage: bin/kiso-icons pin SET [SET...]", :red
@@ -35,6 +51,11 @@ class Kiso::Icons::Commands < Thor
   end
 
   desc "unpin SET", "Remove a vendored icon set"
+
+  # Removes a vendored icon set from disk.
+  #
+  # @param set_name [String] the icon set prefix to remove
+  # @return [void]
   def unpin(set_name)
     path = File.join(vendor_path, "#{set_name}.json")
 
@@ -48,6 +69,10 @@ class Kiso::Icons::Commands < Thor
   end
 
   desc "pristine", "Re-download all pinned icon sets"
+
+  # Re-downloads all currently pinned icon sets from GitHub.
+  #
+  # @return [void]
   def pristine
     sets = vendored_sets
     if sets.empty?
@@ -61,6 +86,10 @@ class Kiso::Icons::Commands < Thor
   end
 
   desc "list", "Show pinned icon sets"
+
+  # Lists all pinned icon sets with icon count and file size.
+  #
+  # @return [void]
   def list
     sets = vendored_sets
     if sets.empty?
@@ -86,6 +115,12 @@ class Kiso::Icons::Commands < Thor
 
   private
 
+  # Downloads and saves a single icon set to the vendor directory.
+  #
+  # @param set_name [String] the icon set prefix
+  # @param vendor_dir [String] absolute path to the vendor directory
+  # @param overwrite [Boolean] whether to overwrite an existing file
+  # @return [void]
   def pin_set(set_name, vendor_dir, overwrite: false)
     dest = File.join(vendor_dir, "#{set_name}.json")
 
@@ -118,6 +153,11 @@ class Kiso::Icons::Commands < Thor
     say "  pin     vendor/icons/#{set_name}.json (#{icon_count} icons, #{size_kb} KB)", :green
   end
 
+  # Downloads a URL, following up to +redirect_limit+ redirects.
+  #
+  # @param url [String] the URL to download
+  # @param redirect_limit [Integer] maximum number of redirects to follow
+  # @return [String, nil] the response body, or nil on error
   def download(url, redirect_limit = 5)
     raise "Too many redirects" if redirect_limit == 0
 
@@ -132,6 +172,9 @@ class Kiso::Icons::Commands < Thor
     nil
   end
 
+  # Returns the absolute path to the vendor icons directory.
+  #
+  # @return [String]
   def vendor_path
     base = if defined?(Rails) && Rails.root
       Rails.root.to_s
@@ -141,6 +184,9 @@ class Kiso::Icons::Commands < Thor
     File.join(base, Kiso::Icons.configuration.vendor_path)
   end
 
+  # Returns sorted prefixes of all vendored icon sets.
+  #
+  # @return [Array<String>]
   def vendored_sets
     Dir.glob(File.join(vendor_path, "*.json"))
       .map { |f| File.basename(f, ".json") }
