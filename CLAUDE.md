@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Commands
 
 ```bash
@@ -26,8 +24,6 @@ Unit tests mock all HTTP with WebMock (included via `webmock/minitest`). Icon se
 
 ## Architecture Notes
 
-All classes live under `Kiso::Icons` in `lib/kiso/icons/`. The Resolver is the central orchestrator — it owns the resolution cascade (cache → loaded sets → vendor JSON → bundled gzip → API). The Set class handles Iconify JSON parsing including alias resolution with transforms (rotate/flip) up to 5 levels deep. The Renderer produces the final SVG string with HTML-escaped attributes.
+Resolver resolution cascade (order matters): cache → loaded sets → vendor JSON → bundled gzip → API. Set alias resolution follows transforms (rotate/flip) up to 5 levels deep.
 
-The Railtie auto-configures `fallback_to_api` based on Rails environment (true in dev/test, false in production) and injects the `kiso_icon_tag` helper into ActionView.
-
-The CLI (`lib/kiso/icons/commands.rb`) uses Thor and downloads icon set JSON from GitHub's raw content URL for the iconify/icon-sets repo.
+Railtie sets `fallback_to_api` true in dev/test, false in production.
